@@ -12,7 +12,7 @@ class LoginWidget(QWidget):
         self.setGeometry(0, 0, 600, 450)
         self.setWindowTitle("ddswoosh's Crypto App")
         self.setStyleSheet("background-color: #1f1f2e;")
-        self.setWindowIcon(QIcon('.gitignore/bitcoin.png'))
+        self.setWindowIcon(QIcon('Logos/bitcoin.png'))
 
         self.username_text = ""
         self.password_text = ""
@@ -55,12 +55,12 @@ class LoginWidget(QWidget):
 
         live_data_layout = QHBoxLayout()
 
-        small_logo_1 = QPixmap(".gitignore/bitcoin.png")
+        small_logo_1 = QPixmap("Logos/bitcoin.png")
         small_logo_1 = small_logo_1.scaledToWidth(50)
         if f.b[0] > 0:
-            mini_logo_1 = QPixmap(".gitignore/up.png")
+            mini_logo_1 = QPixmap("Logos/up.png")
         else:
-            mini_logo_1 = QPixmap(".gitignore/down.png")
+            mini_logo_1 = QPixmap("Logos/down.png")
         mini_logo_1 = mini_logo_1.scaledToWidth(15)
 
         small_logo_label_1 = QLabel(self)
@@ -78,12 +78,12 @@ class LoginWidget(QWidget):
         else:
             percentage_label_1.setStyleSheet("font-size: 13px; color: #ff3300;")
 
-        small_logo_2 = QPixmap(".gitignore/eth.png")
+        small_logo_2 = QPixmap("Logos/eth.png")
         small_logo_2 = small_logo_2.scaledToWidth(50)
         if f.b[1] > 0:
-            mini_logo_2 = QPixmap(".gitignore/up.png")
+            mini_logo_2 = QPixmap("Logos/up.png")
         else:
-            mini_logo_2 = QPixmap(".gitignore/down.png")
+            mini_logo_2 = QPixmap("Logos/down.png")
         mini_logo_2 = mini_logo_2.scaledToWidth(15)
 
         small_logo_label_2 = QLabel(self)
@@ -101,12 +101,12 @@ class LoginWidget(QWidget):
         else:
             percentage_label_2.setStyleSheet("font-size: 13px; color: #ff3300;")
 
-        small_logo_3 = QPixmap(".gitignore/cosmos.png")
+        small_logo_3 = QPixmap("Logos/cosmos.png")
         small_logo_3 = small_logo_3.scaledToWidth(50)
         if f.b[2] > 0:
-            mini_logo_3 = QPixmap(".gitignore/up.png")
+            mini_logo_3 = QPixmap("Logos/up.png")
         else:
-            mini_logo_3 = QPixmap(".gitignore/down.png")
+            mini_logo_3 = QPixmap("Logos/down.png")
         mini_logo_3 = mini_logo_3.scaledToWidth(15)
 
         small_logo_label_3 = QLabel(self)
