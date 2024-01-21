@@ -2,41 +2,38 @@ import os,json,requests
 
 class Get:
     def __init__(self):
-        self.url = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin&x_cg_api_key=CG-TFTmKujK1CwFn4B2KXA4hGPR"
+        self.url = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin"
         self.auth = "CG-TFTmKujK1CwFn4B2KXA4hGPR"
         self.params = {}
-        x = input(pyqtInput)
+        self.x = input("Enter")
 
     def grab(self):
         a = []
-        symbol = x
+        symbol = self.x
         self.params["symbol"] = symbol.lower()
         r = requests.get(self.url).json()
-        return r[0][_]
-        # i = 0
-        # while i < cg.requestmax:
-        #     if cg.request == symbol1:
-        #         a[i] == 0
+        return r[0]
 
     def insert(self):
         pass
 
-class Login:
-    def __init__(self,user,password):
+class User:
+    def __init__(self, user, password):
         self.user = user
-        self.passwrod = password
-    
-    def check(self):
-        if Login(user,password) in db:
-            return True
-        self.login()
-    
-    def login(self):
-        if self.check() == True:
-            pass
-            #run next gui
-l = Login()
-g = Get()
+        self.password = password
+        self.override = False
+
+    # def login(self):
+    #     if self.override:
+    #         if self.user and self.password in db:
+    #             gui.run()
+    #     else:
+    #         if u(lw.username_text, lw.password_text) in db:
+    #             pass
+                # gui.run()
+
 if __name__ in "__main__":
-    g.grab()
-    l.check()
+    u = User(1,2)
+    g = Get()
+    print(g.grab())
+    
