@@ -1,95 +1,71 @@
-import sys
-from main import Get
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QTabWidget, QFormLayout, QLabel, QLineEdit, QPushButton, QMenuBar, QAction
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QLabel, QVBoxLayout, QWidget, QTabWidget, QStackedWidget, QHBoxLayout, QApplication
 from PyQt5.QtGui import QIcon
+from login_gui import LoginWidget
+import sys
 
-class Gui(QMainWindow):
+class WalletPage(QWidget):
     def __init__(self):
-        super(Gui, self).__init__()
+        super().__init__()
 
-        self.setWindowTitle("Market Calculator")
-        self.setGeometry(100, 100, 800, 600)
+        layout = QVBoxLayout(self)
+        label = QLabel("Wallet Page")
+        label.setStyleSheet("font-size: 20px; color: #bb86fc;")
 
+        layout.addWidget(label, alignment=Qt.AlignCenter)
 
-        self.setWindowIcon(QIcon('bitcoin_icon.png'))
+class CalculatorPage(QWidget):
+    def __init__(self):
+        super().__init__()
 
-        self.init_ui()
+        layout = QVBoxLayout(self)
+        label = QLabel("Calculator Page")
+        label.setStyleSheet("font-size: 20px; color: #bb86fc;")
 
-    def init_ui(self):
-        self.central_widget = QWidget(self)
-        self.setCentralWidget(self.central_widget)
+        layout.addWidget(label, alignment=Qt.AlignCenter)
 
-   
-        menubar = self.menuBar()
+class MarketPage(QWidget):
+    def __init__(self):
+        super().__init__()
 
-  
-        self.tab_widget = QTabWidget(self.central_widget)
-        self.login_register_tab()
-        self.crypto_calculator_tab()
+        layout = QVBoxLayout(self)
+        label = QLabel("Market Page")
+        label.setStyleSheet("font-size: 20px; color: #bb86fc;")
 
-    
-        layout = QVBoxLayout(self.central_widget)
-        layout.addWidget(self.tab_widget)
+        layout.addWidget(label, alignment=Qt.AlignCenter)
 
-       
-        self.create_menu()
+class MainWidget(QWidget):
+    def __init__(self):
+        super().__init__()
 
-    def login_register_tab(self):
-        tab = QWidget()
-        layout = QFormLayout(tab)
+        self.setGeometry(0, 0, 800, 600)
+        self.setWindowTitle("Crypto App")
+        self.setStyleSheet("background-color: #1f1f2e;")
+        self.setWindowIcon(QIcon('Logos/bitcoin.png'))
 
-        username_label = QLabel("Username:")
-        username_input = QLineEdit()
+        self.tabs = QTabWidget(self)
+        self.pages = QStackedWidget(self)
 
-        password_label = QLabel("Password:")
-        password_input = QLineEdit()
-        password_input.setEchoMode(QLineEdit.Password)
+        self.wallet_page = WalletPage()
+        self.calculator_page = CalculatorPage()
+        self.market_page = MarketPage()
 
-        login_button = QPushButton("Login")
-        register_button = QPushButton("Register")
+        self.pages.addWidget(self.wallet_page)
+        self.pages.addWidget(self.calculator_page)
+        self.pages.addWidget(self.market_page)
 
-        layout.addRow(username_label, username_input)
-        layout.addRow(password_label, password_input)
-        layout.addRow(login_button, register_button)
+        self.tabs.addTab(self.wallet_page, "Wallet")
+        self.tabs.addTab(self.calculator_page, "Calculator")
+        self.tabs.addTab(self.market_page, "Market")
 
-        self.tab_widget.addTab(tab, "Login/Register")
-
-    def crypto_calculator_tab(self):
-        tab = QWidget()
-        layout = QVBoxLayout(tab)
-
-        coin1_label = QLabel("Coin 1:")
-        coin1_input = QLineEdit()
-
-        coin2_label = QLabel("Coin 2:")
-        coin2_input = QLineEdit()
-
-        calculate_button = QPushButton("Calculate")
-
-        layout.addWidget(coin1_label)
-        layout.addWidget(coin1_input)
-        layout.addWidget(coin2_label)
-        layout.addWidget(coin2_input)
-        layout.addWidget(calculate_button)
-
-        self.tab_widget.addTab(tab, "Crypto Calculator")
-
-    def create_menu(self):
-        menu_widget = QWidget(self.central_widget)
-        menu_layout = QVBoxLayout(menu_widget)
-
-        profile_action = QPushButton("Profile")
-        calculator_action = QPushButton("Calculator")
-        portfolio_action = QPushButton("Portfolio")
-
-        menu_layout.addWidget(profile_action)
-        menu_layout.addWidget(calculator_action)
-        menu_layout.addWidget(portfolio_action)
-
-        self.central_widget.layout().addWidget(menu_widget)
+        layout = QHBoxLayout(self)
+        layout.addWidget(self.tabs)
+        layout.addWidget(self.pages)
 
 if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    market_calculator_app = Gui()
-    market_calculator_app.show()
-    sys.exit(app.exec_())
+    l = LoginWidget.on_login_clicked
+    if l == True:
+        app = QApplication(sys.argv)
+        main_widget = MainWidget()
+        main_widget.show()
+        sys.exit(app.exec_())

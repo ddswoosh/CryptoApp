@@ -1,13 +1,14 @@
-from PyQt5.QtWidgets import QLabel, QLineEdit, QPushButton, QVBoxLayout, QWidget, QHBoxLayout, QApplication
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QIcon, QPixmap
+from PyQt5.QtWidgets import QLabel, QLineEdit, QPushButton, QVBoxLayout, QWidget, QHBoxLayout, QApplication, QMessageBox
+from PyQt5.QtCore import Qt, QObject
+from PyQt5.QtGui import QIcon,QPixmap
+from auth import User
 import requests
 import sys
 
-class LoginWidget(QWidget):
+class LoginWidget(QWidget, QObject):
     def __init__(self):
         self.auth = "CG-TFTmKujK1CwFn4B2KXA4hGPR"
-        super(LoginWidget, self).__init__()
+        super().__init__()
 
         self.setGeometry(0, 0, 600, 450)
         self.setWindowTitle("ddswoosh's Crypto App")
@@ -18,6 +19,12 @@ class LoginWidget(QWidget):
         self.password_text = ""
 
         self.init_ui()
+
+    def popUp(self, message):
+        msg_box = QMessageBox()
+        msg_box.setWindowTitle("Authentication Error")
+        msg_box.setText(message)
+        msg_box.exec_()
 
     def init_ui(self):
         layout = QVBoxLayout(self)
@@ -33,24 +40,24 @@ class LoginWidget(QWidget):
 
         input_width = 200
 
-        username_input = QLineEdit(self)
-        username_input.setPlaceholderText("Username")
-        username_input.setStyleSheet("background-color: #42445a; color: #bb86fc; padding: 10px; border-radius: 5px; text-align: center;")
-        username_input.setAlignment(Qt.AlignCenter)
-        username_input.setFixedWidth(input_width)
-        username_input.textChanged.connect(self.on_username_changed)
+        self.username_input = QLineEdit(self)
+        self.username_input.setPlaceholderText("Username")
+        self.username_input.setStyleSheet("background-color: #42445a; color: #bb86fc; padding: 10px; border-radius: 5px; text-align: center;")
+        self.username_input.setAlignment(Qt.AlignCenter)
+        self.username_input.setFixedWidth(input_width)
+        self.username_input.textChanged.connect(self.on_username_changed)
 
-        password_input = QLineEdit(self)
-        password_input.setPlaceholderText("Password")
-        password_input.setEchoMode(QLineEdit.Password)
-        password_input.setStyleSheet("background-color: #42445a; color: #bb86fc; padding: 10px; border-radius: 5px; text-align: center;")
-        password_input.setAlignment(Qt.AlignCenter)
-        password_input.setFixedWidth(input_width)
-        password_input.textChanged.connect(self.on_password_changed)
+        self.password_input = QLineEdit(self)
+        self.password_input.setPlaceholderText("Password")
+        self.password_input.setEchoMode(QLineEdit.Password)
+        self.password_input.setStyleSheet("background-color: #42445a; color: #bb86fc; padding: 10px; border-radius: 5px; text-align: center;")
+        self.password_input.setAlignment(Qt.AlignCenter)
+        self.password_input.setFixedWidth(input_width)
+        self.password_input.textChanged.connect(self.on_password_changed)
 
         layout.addSpacing(10)  
-        layout.addWidget(username_input, alignment=Qt.AlignCenter)
-        layout.addWidget(password_input, alignment=Qt.AlignCenter)
+        layout.addWidget(self.username_input, alignment=Qt.AlignCenter)
+        layout.addWidget(self.password_input, alignment=Qt.AlignCenter)
         layout.addStretch(1)
 
         live_data_layout = QHBoxLayout()
@@ -140,20 +147,44 @@ class LoginWidget(QWidget):
 
         login_button = QPushButton("Login", self)
         login_button.setStyleSheet("background-color: #6200ea; color: #ffffff; padding: 10px; border-radius: 5px; font-size: 16px;")
+        login_button.clicked.connect(self.on_login_clicked)
+        login_button.installEventFilter(self)
 
         register_button = QPushButton("Register", self)
         register_button.setStyleSheet("background-color: #003366; color: #ffffff; padding: 10px; border-radius: 5px; font-size: 16px;")
+        register_button.clicked.connect(self.on_register_clicked)
+        register_button.installEventFilter(self)
 
         layout.addSpacing(10)  
 
         layout.addWidget(login_button)
         layout.addWidget(register_button)
 
+    def on_login_clicked(self):
+        l = u.login(self.username_text,self.password_text)
+        if l == True:
+            return True
+        
+    def on_register_clicked(self):
+        l = u.register(self.username_text,self.password_text)
+        if l == True:
+            return True
+        
     def on_username_changed(self, text):
         self.username_text = text
 
     def on_password_changed(self, text):
         self.password_text = text
+    
+    def eventFilter(self, obj, event):
+        if event.type() == event.HoverEnter:
+            obj.setStyleSheet("background-color: #4a148c; color: #ffffff; padding: 10px; border-radius: 5px; font-size: 16px;")
+        elif event.type() == event.HoverLeave:
+            obj.setStyleSheet("background-color: #6200ea; color: #ffffff; padding: 10px; border-radius: 5px; font-size: 16px;")
+        return super().eventFilter(obj, event)
+
+    def popUp(self):
+        pass
 
 class FrontPage:
     def introCoins(self):
@@ -165,9 +196,11 @@ class FrontPage:
             self.b.append(change)
 
 if __name__ == "__main__":
+    u = User()
     f = FrontPage()
     f.introCoins()
     app = QApplication(sys.argv)
     lw = LoginWidget()
     lw.show()
     sys.exit(app.exec_())
+    
