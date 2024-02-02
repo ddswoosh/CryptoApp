@@ -21,8 +21,9 @@ class User:
              
     def register(self,username,password):
         if self.override == False:
-            q = "INSERT users (username,password) VALUES (?,?)"
+            q = "INSERT INTO users (username,password) VALUES (?,?)"
             r = cursor.execute(q, (username,password))
+            conn.commit()
             return r.rowcount
         
 u = User()

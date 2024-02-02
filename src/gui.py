@@ -181,13 +181,11 @@ class LoginWidget(QWidget, QObject):
         
     def on_register_clicked(self):
         l = u.register(self.username_text,self.password_text)
-
         if l != 0:
-            self.main_widget = MainWidget()
-            self.main_widget.show()
-            self.close()
-        else:
-            self.popUp("Invalid username or password. Please register your account.")
+            self.popUp(
+                "Your account has been created \n"
+                "Please login."
+                       )
             return
         
     def on_username_changed(self, text):
@@ -230,13 +228,13 @@ class WalletPage(QWidget):
         button_text_color = "#FFFFFF"
 
         layout = QVBoxLayout(self)
-    
+
         chart_view = QGraphicsView(self)
         scene = QGraphicsScene(self)
         chart_view.setScene(scene)
 
         chart = self.createChart()
-        scene.addWidget(chart)
+        scene.addItem(chart)
 
         layout.addWidget(chart_view)
 
@@ -264,8 +262,8 @@ class WalletPage(QWidget):
         chart = QChart()
 
         series = QLineSeries()
-        series.append(QDateTime.currentDateTime().toMSecsSinceEpoch(), 1000) 
-        series.append(QDateTime.currentDateTime().addDays(1).toMSecsSinceEpoch(), 1500) 
+        series.append(QDateTime.currentDateTime().toMSecsSinceEpoch(), 1000)
+        series.append(QDateTime.currentDateTime().addDays(1).toMSecsSinceEpoch(), 1500)
 
         chart.addSeries(series)
 
@@ -280,7 +278,7 @@ class WalletPage(QWidget):
         chart.addAxis(axis_y, Qt.AlignLeft)
         series.attachAxis(axis_x)
         series.attachAxis(axis_y)
-        
+
         chart.setTitle("Portfolio Value Over Time")
 
         chart.setBackgroundBrush(QColor("#F8F8F8"))
