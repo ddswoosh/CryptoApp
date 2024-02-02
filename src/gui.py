@@ -2,10 +2,11 @@ from PyQt5.QtWidgets import (
     QGraphicsView, QLabel, QLineEdit, QPushButton,
     QVBoxLayout, QWidget, QHBoxLayout, QApplication,
     QMessageBox, QTabWidget, QStackedWidget, QSizePolicy,
-    QGraphicsScene
+    QGraphicsScene, QTableWidget, QTableWidgetItem, QHeaderView,
+    QSizePolicy
 )
 from PyQt5.QtChart import QChart, QPieSeries, QChartView, QLineSeries, QDateTimeAxis, QValueAxis
-from PyQt5.QtCore import Qt, QObject, QDateTime
+from PyQt5.QtCore import Qt, QObject, QDateTime, QTimer
 from PyQt5.QtGui import QIcon, QPixmap, QPainter, QColor
 from auth import User
 import requests
@@ -220,33 +221,34 @@ class WalletPage(QWidget):
     def __init__(self):
         super().__init__()
 
-        primary_background_color = "#FFFFFF"
-        input_background_color = "#F8F8F8"
-        input_text_color = "#333333"
-        input_border_color = "#CCCCCC"
-        button_background_color = "#3CC29E"
-        button_text_color = "#FFFFFF"
+        primary_background_color = "#1f1f2e"
+        input_background_color = "transparent"  # Set to transparent for a modern look
+        input_text_color = "#bb86fc"
+        input_border_color = "#bb86fc"
+        button_background_color = "#6200ea"
+        button_text_color = "#ffffff"
 
         layout = QVBoxLayout(self)
+        layout.setAlignment(Qt.AlignCenter)  # Remove layout margins for full width
 
         chart_view = QGraphicsView(self)
+        chart_view.setStyleSheet(f"background-color: {primary_background_color};")
         scene = QGraphicsScene(self)
         chart_view.setScene(scene)
 
-        chart = self.createChart()
-        scene.addItem(chart)
+
 
         layout.addWidget(chart_view)
 
         coin_name_input = QLineEdit(self)
-        coin_name_input.setPlaceholderText("Coin Name")
+        coin_name_input.setPlaceholderText("Coin Ticker (btc)")
         coin_name_input.setStyleSheet(f"background-color: {input_background_color}; color: {input_text_color}; padding: 10px; border: 1px solid {input_border_color}; border-radius: 5px;")
 
         coin_amount_input = QLineEdit(self)
-        coin_amount_input.setPlaceholderText("Amount")
-        coin_amount_input.setStyleSheet(f"background-color: {input_background_color}; color: {input_text_color}; padding: 10px; border: 1px solid {input_border_color}; border-radius: 5px;")
+        coin_amount_input.setPlaceholderText("Quantity")
+        coin_amount_input.setStyleSheet(f"background-color: {input_background_color}; color: {input_text_color}; padding: 10px; border: 1px solid {input_border_color}; border-radius: 5px; text-align: center")
 
-        add_coin_button = QPushButton("Add Coin", self)
+        add_coin_button = QPushButton("Add To Portflio", self)
         add_coin_button.setStyleSheet(f"background-color: {button_background_color}; color: {button_text_color}; padding: 10px; border-radius: 5px; font-size: 16px;")
 
         coin_name_input.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
@@ -256,34 +258,21 @@ class WalletPage(QWidget):
         layout.addWidget(coin_amount_input)
         layout.addWidget(add_coin_button)
 
-        layout.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
+        total_layout = QHBoxLayout()
+        total_label = QLabel("Total:", self)
+        total_label.setStyleSheet(f"font-size: 18px; color: {input_text_color};")
+        total_amount_label = QLabel("$1,271,883.24", self)
+        total_amount_label.setStyleSheet(f"font-size: 18px; color: {input_text_color}; margin-left: 5px;")
 
-    def createChart(self):
-        chart = QChart()
+        total_layout.addWidget(total_label)
+        total_layout.addWidget(total_amount_label)
+        total_layout.addStretch()
+        total_label.setAlignment(Qt.AlignCenter)
 
-        series = QLineSeries()
-        series.append(QDateTime.currentDateTime().toMSecsSinceEpoch(), 1000)
-        series.append(QDateTime.currentDateTime().addDays(1).toMSecsSinceEpoch(), 1500)
+        layout.addLayout(total_layout)
 
-        chart.addSeries(series)
-
-        axis_x = QDateTimeAxis()
-        axis_x.setFormat("dd.MM.yyyy")
-        axis_x.setTitleText("Date")
-
-        axis_y = QValueAxis()
-        axis_y.setTitleText("Amount ($)")
-
-        chart.addAxis(axis_x, Qt.AlignBottom)
-        chart.addAxis(axis_y, Qt.AlignLeft)
-        series.attachAxis(axis_x)
-        series.attachAxis(axis_y)
-
-        chart.setTitle("Portfolio Value Over Time")
-
-        chart.setBackgroundBrush(QColor("#F8F8F8"))
-
-        return chart
+        layout.setAlignment(Qt.AlignTop)
+        self.setStyleSheet(f"background-color: {primary_background_color};")
 
 class CalculatorPage(QWidget):
     def __init__(self):
@@ -309,59 +298,51 @@ class CalculatorPage(QWidget):
     def on_calculate_clicked(self):
         pass
 
-class MarketPage(QWidget):
-    def __init__(self):
-        super().__init__()
-
-        layout = QVBoxLayout(self)
-
-        for i in range(1, 11):
-            crypto_label = QLabel(f"{i}. Crypto {i}", self)
-            crypto_label.setStyleSheet("font-size: 16px; color: #bb86fc; padding-bottom: 5px;")
-            layout.addWidget(crypto_label, alignment=Qt.AlignTop | Qt.AlignHCenter)
-
-
 class MainWidget(QWidget):
     def __init__(self):
         super().__init__()
 
-        self.setGeometry(0, 0, 800, 600)
+        self.setGeometry(0, 0, 8500, 600)  
         self.setWindowTitle("Crypto App")
         self.setStyleSheet("background-color: #1f1f2e;")
         self.setWindowIcon(QIcon('Logos/bitcoin.png'))
 
+        self.setMaximumWidth(850)
+        self.setMaximumHeight(600)
+        self.setMinimumWidth(850)
+        self.setMinimumHeight(600)
+
         main_layout = QVBoxLayout(self)
-        tabs_layout = QHBoxLayout()
+        main_layout.setAlignment(Qt.AlignCenter) 
 
         self.tabs = QTabWidget(self)
-        self.tabs.setStyleSheet("QTabBar::tab { color: #bb86fc; background-color: #6200ea; padding: 8px; }"
+        self.tabs.setStyleSheet("QTabBar::tab { color: #bb86fc; background-color: #6200ea; padding: 8px 20px; }"
                                 "QTabBar::tab:selected { background-color: #4a148c; }"
                                 "QTabWidget::pane { border: none; }")
-        self.tabs.setTabPosition(QTabWidget.West)
+        self.tabs.setTabPosition(QTabWidget.North)
+        self.tabs.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.tabs.setMinimumWidth(800)
 
         self.pages = QStackedWidget(self)
+        self.pages.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
 
         self.wallet_page = WalletPage()
         self.calculator_page = CalculatorPage()
-        self.market_page = MarketPage()
 
         self.pages.addWidget(self.wallet_page)
         self.pages.addWidget(self.calculator_page)
-        self.pages.addWidget(self.market_page)
 
         self.tabs.addTab(self.wallet_page, self.createTabIcon("Logos/wallet_icon.png"), "Wallet")
         self.tabs.addTab(self.calculator_page, self.createTabIcon("Logos/calculator_icon.png"), "Calculator")
-        self.tabs.addTab(self.market_page, self.createTabIcon("Logos/market_icon.png"), "Market")
 
-        tabs_layout.addWidget(self.tabs)
-        tabs_layout.addWidget(self.pages)
-
-        main_layout.addLayout(tabs_layout)
+        main_layout.addWidget(self.tabs, alignment=Qt.AlignCenter)  # Centered the tabs
+        main_layout.addWidget(self.pages)
 
     def createTabIcon(self, icon_path):
         tab_icon = QPixmap(icon_path)
         tab_icon = tab_icon.scaledToWidth(30, mode=Qt.SmoothTransformation)
         return QIcon(tab_icon)
+    
 if __name__ == "__main__":
     u = User()
     f = FrontPage()
