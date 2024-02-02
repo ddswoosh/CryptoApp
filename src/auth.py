@@ -16,11 +16,13 @@ class User:
         if self.override == False:
             q = "SELECT * FROM users WHERE username = ? AND password = ?"
             r = cursor.execute(q, (username, password))
-            return bool(r)
+            return r.rowcount
 
              
     def register(self,username,password):
         if self.override == False:
-            q = f"INSERT INTO users (username,password) VALUES (?,?))"
-            r = cursor.execute(q,(username,password))
-            return bool(r)
+            q = "INSERT users (username,password) VALUES (?,?)"
+            r = cursor.execute(q, (username,password))
+            return r.rowcount
+        
+u = User()
