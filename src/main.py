@@ -1,18 +1,21 @@
-import json,requests
-
+import json,requests,math,time
 class Get:
     def __init__(self):
-        self.url = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin"
-        self.auth = "CG-TFTmKujK1CwFn4B2KXA4hGPR"
-        self.params = {}
-        self.x = input("Enter")
+        self.header = {
+            "accept" : "application/json"
+        }
+        ct = time.localtime()
+        self.year = ct.tm_year
+        self.month = ct.tm_mon
+        self.day = ct.tm_mday
 
-    def grab(self):
-        a = []
-        symbol = self.x
-        self.params["symbol"] = symbol.lower()
-        r = requests.get(self.url).json()
-        return r[0]
+    def grab(self,id):
+        id = id.lower()
+        r = requests.get(f"https://api.coingecko.com/api/v3/coins/{id}/history?date={self.day}-{self.month}-{self.year}", headers=self.header).json()
+        r = r["market_data"]["current_price"]["usd"]
+        r = round(r,2)
+        return r
 
     def insert(self):
         pass
+
