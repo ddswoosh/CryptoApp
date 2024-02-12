@@ -378,7 +378,7 @@ class CalculatorPage(QWidget):
         else:
             g = Get()
             new_price = g.calc(self.coin1_value, self.coin2_value)
-            result_text = f"{new_price[0].upper()} with {new_price[1].upper()}'S market cap, puts 1 coin at {new_price[2]} $({new_price[3]})x"
+            result_text = f"{new_price[0].upper()} with {new_price[1].upper()}'S market cap, puts 1 coin at ${new_price[2]} ({new_price[3]})x"
             self.coin2_input.setPlaceholderText(result_text)
 
             self.result_label.setText(result_text)
