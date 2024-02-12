@@ -3,11 +3,11 @@ from PyQt5.QtWidgets import (
     QVBoxLayout, QWidget, QHBoxLayout, QApplication,
     QMessageBox, QTabWidget, QStackedWidget, QSizePolicy,
     QGraphicsScene, QTableWidget, QTableWidgetItem, QHeaderView,
-    QSizePolicy, QScrollArea
+    QSizePolicy, QScrollArea, 
 )
 from PyQt5.QtChart import QChart, QPieSeries, QChartView, QLineSeries, QDateTimeAxis, QValueAxis
-from PyQt5.QtCore import Qt, QObject, QDateTime, QTimer
-from PyQt5.QtGui import QIcon, QPixmap, QPainter, QColor
+from PyQt5.QtCore import Qt, QObject, QDateTime, QTimer, QEvent
+from PyQt5.QtGui import QIcon, QPixmap, QPainter, QColor, QCursor
 from auth import User
 import requests
 import sys
@@ -231,16 +231,11 @@ class WalletPage(QWidget):
         input_border_color = "#bb86fc"
         button_background_color = "#6200ea"
         button_text_color = "#ffffff"
+        button_hover_color = "#7a29d2" 
 
         layout = QVBoxLayout(self)
         layout.setAlignment(Qt.AlignCenter)
-
-        chart_view = QGraphicsView(self)
-        chart_view.setStyleSheet(f"background-color: {primary_background_color};")
-        scene = QGraphicsScene(self)
-        chart_view.setScene(scene)
-
-        layout.addWidget(chart_view)
+        layout.setContentsMargins(0, 0, 0, 0)
 
         self.coin_name_input = QLineEdit(self)
         self.coin_name_input.setPlaceholderText("Coin Name (eg. bitcoin | ethereum)")
@@ -254,17 +249,18 @@ class WalletPage(QWidget):
             f"background-color: {input_background_color}; color: {input_text_color}; padding: 10px; border: 1px solid {input_border_color}; border-radius: 5px; text-align: center")
         self.coin_amount_input.textChanged.connect(self.onQuantityChanged)
 
-        add_coin_button = QPushButton("Add To Portfolio", self)
-        add_coin_button.setStyleSheet(
+        self.add_coin_button = QPushButton("Add To Portfolio", self)
+        self.add_coin_button.setStyleSheet(
             f"background-color: {button_background_color}; color: {button_text_color}; padding: 10px; border-radius: 5px; font-size: 16px;")
-        add_coin_button.clicked.connect(self.addPortfolio)
+        self.add_coin_button.setCursor(QCursor(Qt.PointingHandCursor))
+        self.add_coin_button.clicked.connect(self.addPortfolio)
 
         self.coin_name_input.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.coin_amount_input.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
 
         layout.addWidget(self.coin_name_input)
         layout.addWidget(self.coin_amount_input)
-        layout.addWidget(add_coin_button)
+        layout.addWidget(self.add_coin_button)
 
         self.coin_list_layout = QVBoxLayout()
         coin_scroll_area = QScrollArea()
@@ -273,7 +269,7 @@ class WalletPage(QWidget):
         coin_scroll_area.setWidget(QWidget())
         coin_scroll_area.widget().setLayout(self.coin_list_layout)
 
-        layout.addWidget(coin_scroll_area)
+        layout.addWidget(coin_scroll_area, 1)
 
         total_layout = QHBoxLayout()
         total_label = QLabel("Total:", self)
@@ -298,14 +294,13 @@ class WalletPage(QWidget):
         self.quantity_text = text
     
     def addPortfolio(self):
-
         if self.coin_text:
             quantity = float(self.quantity_text)
             if 0 < quantity <= 1000000:
                 g = Get()
                 price = g.grab(self.coin_text)
                 self.coin_total = price * quantity
-                self.arr.append(round(self.coin_total,2))
+                self.arr.append(round(self.coin_total, 2))
                 self.addCoinToList(self.coin_text.upper(), quantity, math.floor(self.coin_total))
             else:
                 self.popUp("Please enter a quantity between 1 and 1,000,000")
@@ -315,10 +310,9 @@ class WalletPage(QWidget):
     def addCoinToList(self, coin, quantity, total):
         arr = []
         arr.append(total)
-        coin_label = QLabel(f"{coin}                                               Amount: {quantity}                                      Total: ${total}")
+        coin_label = QLabel(f"{coin} ----- Quantity: {quantity}                                                                              Total: ${total}")
         coin_label.setStyleSheet(f"color: #ffffff; font-size: 16px;")
         self.coin_list_layout.addWidget(coin_label)
-        print(self.arr)
         total = 0
         for i in range(len(self.arr)):
             total += self.arr[i]
@@ -330,29 +324,70 @@ class WalletPage(QWidget):
         msg_box.setText(message)
         msg_box.exec_()
 
+
 class CalculatorPage(QWidget):
     def __init__(self):
         super().__init__()
 
+        self.coin1_value = ""
+        self.coin2_value = ""
+
         layout = QVBoxLayout(self)
-        coin1_input = QLineEdit(self)
-        coin1_input.setPlaceholderText("Coin 1")
-        coin1_input.setStyleSheet("background-color: #42445a; color: #bb86fc; padding: 10px; border-radius: 5px; text-align: center;")
+        self.coin1_input = QLineEdit(self)
+        self.coin1_input.setPlaceholderText("Coin 1")
+        self.coin1_input.setStyleSheet("background-color: #42445a; color: #bb86fc; padding: 10px; border-radius: 5px; text-align: center;")
+        self.coin1_input.textChanged.connect(self.onCoin1Changed)
 
-        coin2_input = QLineEdit(self)
-        coin2_input.setPlaceholderText("Coin 2")
-        coin2_input.setStyleSheet("background-color: #42445a; color: #bb86fc; padding: 10px; border-radius: 5px; text-align: center;")
+        self.coin2_input = QLineEdit(self)
+        self.coin2_input.setPlaceholderText("Coin 2")
+        self.coin2_input.setStyleSheet("background-color: #42445a; color: #bb86fc; padding: 10px; border-radius: 5px; text-align: center;")
+        self.coin2_input.textChanged.connect(self.onCoin2Changed)
 
-        calculate_button = QPushButton("Calculate", self)
-        calculate_button.setStyleSheet("background-color: #6200ea; color: #ffffff; padding: 10px; border-radius: 5px; font-size: 16px;")
-        calculate_button.clicked.connect(self.onCalculateClicked)
+        self.calculate_button = QPushButton("Calculate", self)
+        self.calculate_button.setStyleSheet("background-color: #6200ea; color: #ffffff; padding: 10px; border-radius: 5px; font-size: 16px;")
+        self.calculate_button.clicked.connect(self.onCalculateClicked)
+        self.calculate_button.setCursor(QCursor(Qt.PointingHandCursor))
+        self.calculate_button.setMouseTracking(True)
+        self.calculate_button.installEventFilter(self)
 
-        layout.addWidget(coin1_input, alignment=Qt.AlignCenter)
-        layout.addWidget(coin2_input, alignment=Qt.AlignCenter)
-        layout.addWidget(calculate_button, alignment=Qt.AlignCenter)
+        self.result_label = QLabel("", self)
+        self.result_label.setStyleSheet("color: #ffffff; font-size: 14px;")
+
+        layout.addWidget(self.coin1_input, alignment=Qt.AlignCenter)
+        layout.addWidget(self.coin2_input, alignment=Qt.AlignCenter)
+        layout.addWidget(self.calculate_button, alignment=Qt.AlignCenter)
+        layout.addWidget(self.result_label, alignment=Qt.AlignCenter)
+
+    def eventFilter(self, obj, event):
+        if obj == self.calculate_button:
+            if event.type() == QEvent.Enter:
+                self.calculate_button.setStyleSheet("background-color: #7a29d2; color: #ffffff; padding: 10px; border-radius: 5px; font-size: 16px;")
+            elif event.type() == QEvent.Leave:
+                self.calculate_button.setStyleSheet("background-color: #6200ea; color: #ffffff; padding: 10px; border-radius: 5px; font-size: 16px;")
+        return super().eventFilter(obj, event)
+
+    def onCoin1Changed(self, text):
+        self.coin1_value = text
+    
+    def onCoin2Changed(self, text):
+        self.coin2_value = text
 
     def onCalculateClicked(self):
-        pass
+        if not self.coin1_value or not self.coin2_value:
+            self.popUp("Please enter a coin in both fields.")
+        else:
+            g = Get()
+            new_price = g.calc(self.coin1_value, self.coin2_value)
+            result_text = f"{new_price[0].upper()} with {new_price[1].upper()}'S market cap, puts 1 coin at {new_price[2]} $({new_price[3]})x"
+            self.coin2_input.setPlaceholderText(result_text)
+
+            self.result_label.setText(result_text)
+            self.result_label.setStyleSheet("color: #ffffff; font-size: 16px; background-color: #212121; padding: 10px; border-radius: 5px;")
+    def popUp(self, message):
+        msg_box = QMessageBox()
+        msg_box.setWindowTitle("Error")
+        msg_box.setText(message)
+        msg_box.exec_()
 
 class MainWidget(QWidget):
     def __init__(self):
