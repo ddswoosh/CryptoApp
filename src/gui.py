@@ -5,7 +5,6 @@ from PyQt5.QtWidgets import (
     QGraphicsScene, QTableWidget, QTableWidgetItem, QHeaderView,
     QSizePolicy, QScrollArea, 
 )
-from PyQt5.QtChart import QChart, QPieSeries, QChartView, QLineSeries, QDateTimeAxis, QValueAxis
 from PyQt5.QtCore import Qt, QObject, QDateTime, QTimer, QEvent
 from PyQt5.QtGui import QIcon, QPixmap, QPainter, QColor, QCursor
 from auth import User
