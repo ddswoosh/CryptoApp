@@ -5,6 +5,7 @@ The application is designed to provide real-time data for various cryptocurrenci
 
 # Tech Stack
 * Python
+* Docker
 * PyQT5
 * AWS Relational Database (Currently on MSSQL for cost saving but can be reverted to AWS for live use)
 * Microsoft SQL Server
